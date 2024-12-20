@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import IngredientList from "./Ingredients";
 import ClaudeRecipe from "./ClaudeRecipe";
 import getRecipeFromMistral from "./ai"
@@ -7,6 +7,8 @@ import getRecipeFromMistral from "./ai"
 export default function Main(){
     const [recipe,setRecipe]=useState("")
     const[ingredients,setIngredients]=useState([])
+    const recipeSection=useRef(null)
+    console.log(recipeSection)
     function Submitted(event){
         event.preventDefault();
         const formEl=event.currentTarget
@@ -21,6 +23,11 @@ export default function Main(){
        const recipeMarkdown = await  getRecipeFromMistral(ingredients)
        setRecipe(recipeMarkdown)
     }
+    useEffect(()=>{
+        if(recipe!==""&&recipeSection.current!==null){
+            recipeSection.current.scrollIntoView({behavior:"smooth"})
+        }
+    },[recipe])
     return(
         <main>
             <form className="add-ingredient-form" onClick={Submitted} >
@@ -32,7 +39,7 @@ export default function Main(){
                 />
                 <button >Add Ingredient</button>
             </form>
-          <IngredientList recipe={getRecipe} ingredients={ingredients}/>
+          <IngredientList recipe={getRecipe} ingredients={ingredients} ref={recipeSection}/>
             {recipe && <ClaudeRecipe recipe={recipe}/>}
     </main>
     )
